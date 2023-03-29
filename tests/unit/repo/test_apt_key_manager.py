@@ -25,6 +25,7 @@ from craft_archives.repo.apt_key_manager import AptKeyManager
 from craft_archives.repo.package_repository import (
     PackageRepositoryApt,
     PackageRepositoryAptPPA,
+    PackageRepositoryAptUCA,
 )
 
 with open(pathlib.Path(__file__).parent / "test_data/FC42E99D.asc") as _f:
@@ -430,3 +431,27 @@ def test_install_package_repository_key_ppa_from_keyserver(apt_gpg, mocker):
     assert mock_install_key_from_keyserver.mock_calls == [
         call(key_id="FAKE-PPA-SIGNING-KEY", key_server="keyserver.ubuntu.com")
     ]
+
+
+def test_install_package_repository_key_uca_not_installed(apt_gpg, mocker):
+    mock_install_uca_keyring = mocker.patch(
+        "craft_archives.repo.apt_uca.install_uca_keyring", return_value=True
+    )
+    package_repo = PackageRepositoryAptUCA(cloud="antelope")
+
+    updated = apt_gpg.install_package_repository_key(package_repo=package_repo)
+
+    assert updated is True
+    assert mock_install_uca_keyring.call_count == 1
+
+
+def test_install_package_repository_key_uca_already_installed(apt_gpg, mocker):
+    mock_install_uca_keyring = mocker.patch(
+        "craft_archives.repo.apt_uca.install_uca_keyring", return_value=False
+    )
+    package_repo = PackageRepositoryAptUCA(cloud="antelope")
+
+    updated = apt_gpg.install_package_repository_key(package_repo=package_repo)
+
+    assert updated is False
+    assert mock_install_uca_keyring.call_count == 1
