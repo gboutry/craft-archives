@@ -84,9 +84,14 @@ class AptSourcesManager:
         *,
         sources_list_d: Path = _DEFAULT_SOURCES_DIRECTORY,
         keyrings_dir: Path = apt_key_manager.KEYRINGS_PATH,
+        root_dir: Optional[Path] = None,
     ) -> None:
         self._sources_list_d = sources_list_d
         self._keyrings_dir = keyrings_dir
+        self._root_dir = root_dir
+        if self._root_dir:
+            self._sources_list_d = self._root_dir / "etc/apt/sources.list.d"
+            self._keyrings_dir = self._root_dir / "etc/apt/keyrings"
 
     def _install_sources(
         self,
@@ -98,6 +103,7 @@ class AptSourcesManager:
         suites: List[str],
         url: str,
         keyring_path: pathlib.Path,
+        keyring_root: Optional[pathlib.Path] = None,
     ) -> bool:
         """Install sources list configuration.
 
@@ -108,6 +114,9 @@ class AptSourcesManager:
         """
         if keyring_path and not keyring_path.is_file():
             raise errors.AptGPGKeyringError(keyring_path)
+
+        if keyring_root is not None:
+            keyring_path = Path("/") / keyring_path.relative_to(keyring_root)
 
         config = _construct_deb822_source(
             architectures=architectures,
@@ -214,6 +223,7 @@ class AptSourcesManager:
             suites=[codename],
             url=f"http://ppa.launchpad.net/{owner}/{name}/ubuntu",
             keyring_path=keyring_path,
+            keyring_root=self._root_dir,
         )
 
     def _install_sources_uca(
@@ -246,6 +256,7 @@ class AptSourcesManager:
             suites=[f"{codename}-{pocket}/{cloud}"],
             url=package_repository.UCA_ARCHIVE,
             keyring_path=keyring_path,
+            keyring_root=self._root_dir,
         )
 
     def install_package_repository_sources(

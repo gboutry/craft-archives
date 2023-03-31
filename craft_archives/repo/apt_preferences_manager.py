@@ -110,10 +110,14 @@ class AptPreferencesManager:
         *,
         path: Path = _DEFAULT_PREFERENCES_FILE,
         header: str = _DEFAULT_HEADER,
+        root_dir: typing.Optional[Path] = None,
     ) -> None:
         self._header = header
         self._path = path
         self._preferences: typing.List[Preference] = []
+
+        if root_dir is not None:
+            self._path = root_dir / "etc/apt/preferences.d/craft-archives"
 
     def read(self) -> None:
         """Read the preferences file and populate Preferences objects."""

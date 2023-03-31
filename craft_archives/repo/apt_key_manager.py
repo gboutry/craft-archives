@@ -88,8 +88,11 @@ class AptKeyManager:
         *,
         keyrings_path: pathlib.Path = KEYRINGS_PATH,
         key_assets: pathlib.Path,
+        root_dir: Optional[pathlib.Path] = None,
     ) -> None:
         self._keyrings_path = keyrings_path
+        if root_dir:
+            self._keyrings_path = root_dir / "etc/apt/keyrings"
         self._key_assets = key_assets
 
     def find_asset_with_key_id(self, *, key_id: str) -> Optional[pathlib.Path]:

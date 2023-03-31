@@ -17,7 +17,7 @@
 """Package repository installer."""
 
 import pathlib
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from . import errors
 from .apt_key_manager import AptKeyManager
@@ -32,7 +32,10 @@ from .package_repository import (
 
 
 def install(
-    project_repositories: List[Dict[str, Any]], *, key_assets: pathlib.Path
+    project_repositories: List[Dict[str, Any]],
+    *,
+    key_assets: pathlib.Path,
+    root_dir: Optional[pathlib.Path] = None,
 ) -> bool:
     """Add package repositories to the host system.
 
@@ -41,9 +44,9 @@ def install(
 
     :return: Whether a package list refresh is required.
     """
-    key_manager = AptKeyManager(key_assets=key_assets)
-    sources_manager = AptSourcesManager()
-    preferences_manager = AptPreferencesManager()
+    key_manager = AptKeyManager(key_assets=key_assets, root_dir=root_dir)
+    sources_manager = AptSourcesManager(root_dir=root_dir)
+    preferences_manager = AptPreferencesManager(root_dir=root_dir)
 
     package_repositories = _unmarshal_repositories(project_repositories)
 
