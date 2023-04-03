@@ -31,9 +31,7 @@ UCA_ARCHIVE = "http://ubuntu-cloud.archive.canonical.com/ubuntu"
 UCA_NETLOC = urlparse(UCA_ARCHIVE).netloc
 UCA_VALID_POCKETS = ["updates", "proposed"]
 UCA_DEFAULT_POCKET = UCA_VALID_POCKETS[0]
-UCA_KEYRING_PATH = "/usr/share/keyrings/ubuntu-cloud-keyring.gpg"
-
-UCA_KEYRING_PACKAGE = "ubuntu-cloud-keyring"
+UCA_KEY_ID = "391A9AA2147192839E9DB0315EDB1B62EC4926EA"
 
 
 class PriorityString(enum.IntEnum):

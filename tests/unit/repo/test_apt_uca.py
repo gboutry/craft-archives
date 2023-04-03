@@ -15,57 +15,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import http
-import subprocess
 import urllib.error
-from unittest.mock import Mock, call, patch
+from unittest.mock import Mock, patch
 
 import pytest
-from craft_archives.repo import apt_uca, errors, package_repository
-
-
-@patch("subprocess.run")
-def test_install_uca_keyring_already_installed(subprocess):
-    assert apt_uca.install_uca_keyring() is False
-    assert subprocess.mock_calls == [
-        call(
-            ["dpkg", "--status", package_repository.UCA_KEYRING_PACKAGE],
-            check=True,
-            capture_output=True,
-        )
-    ]
-
-
-@patch(
-    "subprocess.run",
-    side_effect=[
-        subprocess.CalledProcessError(
-            1,
-            cmd="dpkg --status ubuntu-cloud-keyring",
-            stderr=b"dpkg-query: package 'ubuntu-cloud-keyring' is not installed and no information is available",
-        ),
-        None,
-    ],
-)
-def test_install_uca_keyring_not_installed(subprocess):
-    assert apt_uca.install_uca_keyring() is True
-    assert subprocess.call_count == 2
-    assert subprocess.called_with(
-        ["apt", "install", "--yes", package_repository.UCA_KEYRING_PACKAGE], check=True
-    )
-
-
-@patch(
-    "subprocess.run",
-    side_effect=subprocess.CalledProcessError(
-        1,
-        cmd="dpkg --status ubuntu-cloud-keyring",
-        stderr=b"unknown error",
-    ),
-)
-def test_install_uca_keyring_unknown_error(subprocess_patched):
-    with pytest.raises(subprocess.CalledProcessError):
-        apt_uca.install_uca_keyring()
-    assert subprocess_patched.call_count == 1
+from craft_archives.repo import apt_uca, errors
 
 
 @patch("urllib.request.urlopen", return_value=Mock(status=http.HTTPStatus.OK))

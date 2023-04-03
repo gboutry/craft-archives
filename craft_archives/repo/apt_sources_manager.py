@@ -235,8 +235,10 @@ class AptSourcesManager:
         codename = os_release.OsRelease().version_codename()
         apt_uca.check_release_compatibility(codename, cloud, pocket)
 
-        keyring_path = apt_uca.get_uca_keyring_path()
-
+        key_id = package_repository.UCA_KEY_ID
+        keyring_path = apt_key_manager.get_keyring_path(
+            key_id, base_path=self._keyrings_dir
+        )
         return self._install_sources(
             components=["main"],
             formats=["deb"],

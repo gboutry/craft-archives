@@ -17,8 +17,6 @@
 """Ubuntu Cloud Archive helpers."""
 
 import http
-import pathlib
-import subprocess
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -27,30 +25,7 @@ from . import errors
 from .package_repository import (
     UCA_ARCHIVE,
     UCA_DEFAULT_POCKET,
-    UCA_KEYRING_PACKAGE,
-    UCA_KEYRING_PATH,
 )
-
-
-def install_uca_keyring() -> bool:
-    """Install UCA keyring if missing."""
-    try:
-        subprocess.run(
-            ["dpkg", "--status", UCA_KEYRING_PACKAGE],
-            check=True,
-            capture_output=True,
-        )
-        return False
-    except subprocess.CalledProcessError as e:
-        if b"not installed" not in e.stderr:
-            raise e
-    subprocess.run(["apt", "install", "--yes", UCA_KEYRING_PACKAGE], check=True)
-    return True
-
-
-def get_uca_keyring_path() -> pathlib.Path:
-    """Return UCA keyring path."""
-    return pathlib.Path(UCA_KEYRING_PATH)
 
 
 def check_release_compatibility(

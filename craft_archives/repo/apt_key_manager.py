@@ -25,7 +25,7 @@ import tempfile
 from contextlib import contextmanager
 from typing import Iterable, Iterator, List, Optional
 
-from . import apt_ppa, apt_uca, errors, package_repository
+from . import apt_ppa, errors, package_repository
 
 logger = logging.getLogger(__name__)
 
@@ -231,9 +231,6 @@ class AptKeyManager:
         3) Install key from key server, if available. An unspecified
            keyserver will default to using keyserver.ubuntu.com.
 
-        For Cloud Archive repositories, the keyring is installed
-        from a package
-
         :param package_repo: Apt PackageRepository configuration.
 
         :returns: True if key configuration was changed. False if
@@ -245,7 +242,7 @@ class AptKeyManager:
         if isinstance(package_repo, package_repository.PackageRepositoryAptPPA):
             key_id = apt_ppa.get_launchpad_ppa_key_id(ppa=package_repo.ppa)
         elif isinstance(package_repo, package_repository.PackageRepositoryAptUCA):
-            return apt_uca.install_uca_keyring()
+            key_id = package_repository.UCA_KEY_ID
         elif isinstance(package_repo, package_repository.PackageRepositoryApt):
             key_id = package_repo.key_id
             if package_repo.key_server:
